@@ -1,0 +1,11 @@
+{
+"ytdl": {
+  "replicas":4
+},
+"gdl": {
+  "replicas":3
+},
+"ripme": {
+  "replicas":3
+}
+}

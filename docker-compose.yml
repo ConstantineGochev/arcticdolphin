@@ -1,0 +1,22 @@
+version: '3'
+services:
+  ui:
+    container_name: ui
+    stdin_open: true
+    build:
+      context: ./ui
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./ui:/app
+  redis:
+    container_name: redis
+    image: redis
+    command: redis-server
+    volumes:
+      - ./redis-dev-data:/data
+    ports:
+      - "6379:6379"

@@ -1,0 +1,10 @@
+/api/node_modules
+/ui/node_modules
+data/yt/*
+data/ripme/*
+data/gallery-dl/*
+
+!data/ytdl/empty.txt
+!data/ripme/empty.txt
+!data/ripme/ripme.jar
+!data/gdl/empty.txt
