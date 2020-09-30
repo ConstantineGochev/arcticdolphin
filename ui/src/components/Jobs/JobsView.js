@@ -4,7 +4,6 @@ import EnhancedTableHead from "./Table/Table";
 import CheckboxesGroup from "./GroupsList/GroupsList";
 import SearchInput from "./SearchInput/SearchInput";
 import Grid from "@material-ui/core/Grid";
-import Radio from '@material-ui/core/Radio';
 import { toolNames } from '../../constants.js'
 import axios from 'axios'
 
@@ -18,6 +17,11 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 'auto',
     marginRight: 'auto',
     backgroundColor: '#F2F2F2',
+  },
+  item: {
+    display: 'flex',
+    flexDirection: 'column',
+    width: '80%'
   },
   Typography: {
     paddingTop: theme.spacing(3),
@@ -63,10 +67,10 @@ export default function JobsView() {
       </Typography>
       <Grid container spacing={1} direction="row">
         <Grid item xs={3}>
-          <Grid item>
+          <Grid item className={classes.item}>
             <SearchInput label="Search"/>
           </Grid>
-          <Grid item>
+          <Grid item className={classes.item}>
           <CheckboxesGroup selectedTool={selectedTool} handleClick={handleClick} />
          </Grid>
         </Grid>

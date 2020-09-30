@@ -13,7 +13,7 @@ const {YOUTUBE_DL, RIP_ME, GALLERY_DL} = toolNames;
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '90%',
-    minHeight: 'calc(100vh - 52px);',
+    minHeight: 'calc(100vh - 142px)',
     flexGrow: '1',
     marginLeft: 'auto',
     marginRight: 'auto',
@@ -39,6 +39,13 @@ const useStyles = makeStyles((theme) => ({
   indicator: {
     backgroundColor: 'black',
     height: theme.spacing(0.4)
+  },
+  margin: {
+    marginBottom: theme.spacing(9),
+    marginTop: theme.spacing(9),
+  },
+  NavTabs: {
+    backgroundColor:'red'
   }
 }));
 
@@ -99,10 +106,10 @@ function NavTabs() {
       <AppBar position="static" className={classes.AppBar}>
         <Tabs
           classes={{indicator: classes.indicator}}
-          variant="fullWidth"
           value={value}
           onChange={handleChange}
           aria-label="nav tabs example"
+          centered
         >
           <LinkTab label={ YOUTUBE_DL } href="/youtube-dl" {...a11yProps(0)} />
           <LinkTab label={ RIP_ME } href="/ripme" {...a11yProps(1)} />
@@ -110,19 +117,19 @@ function NavTabs() {
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
-        <Typography variant="h2" component="h2">
+        <Typography variant="h3" className={classes.margin}>
             YoutubeDl
         </Typography>
         <JobsForm tool={YOUTUBE_DL} dynamicOptions={youtubedlDynamicOptions} staticOptions={youtubedlStaticOptions} jobOptions={jobOptions} />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <Typography variant="h2" component="h2">
+        <Typography variant="h3" className={classes.margin}>
             RipMe
         </Typography>
         <JobsForm tool={RIP_ME} staticOptions={ripmeStaticOptions} dynamicOptions={[]} jobOptions={jobOptions}/>
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <Typography variant="h2" component="h2">
+        <Typography variant="h3" className={classes.margin}>
             GalleryDl
         </Typography>
         <JobsForm tool={GALLERY_DL} staticOptions={[]} dynamicOptions={[]} jobOptions={jobOptions}/>
@@ -137,7 +144,7 @@ export default function CreateJobsView() {
       <Typography variant="h4" className={classes.Typography}>
         Jobs
       </Typography>
-      <NavTabs />
+      <NavTabs className={classes.NavTabs}/>
     </div>
   );
 }

@@ -60,6 +60,9 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(0.5),
     fontSize: "1rem",
   },
+  pagination: {
+    marginRight: theme.spacing(1)
+  }
 }));
 function toDate(timestamp) {
   return moment(timestamp).format("DD.MM.YYYY HH:MM:SS");
@@ -167,6 +170,7 @@ export default function CustomizedTables(props) {
         page={page}
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
+        className={classes.pagination}
       />
     </React.Fragment>
   );
