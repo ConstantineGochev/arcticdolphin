@@ -8,31 +8,36 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Checkbox from '@material-ui/core/Checkbox';
 import Chip from '@material-ui/core/Chip';
 import Input from '@material-ui/core/Input';
+import './JobsFrom.css';
 
 const useStyles = makeStyles((theme) => ({
   Button: {
-    width: "fit-content",
-    fontWeight: "bold",
-    textTransform: "none",
-  },
-  addButton: {
-    display: 'block',
-    color: "#575757",
-    border: "2px solid #575757",
+    width: '25%',
+    fontWeight: 'bold',
+    borderRadius: '20px',
+    textTransform: "none"
   },
   root: {
+    marginLeft: 'auto',
+    marginRight: 'auto',
     '& > *': {
       margin: theme.spacing(1),
     }
   },
+  addButton: {
+    color: '#75B04E',
+    fontSize: '1rem',
+    border: "2px solid #75B04E",
+    marginTop: theme.spacing(10),
+    marginLeft: 'auto',
+    marginRight: 'auto'     
+  },
   formControl: {
-    margin: theme.spacing(1),
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
     minWidth: 120,
-    maxWidth: 300,
   },
   chips: {
     display: 'flex',
@@ -48,6 +53,11 @@ const useStyles = makeStyles((theme) => ({
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
+  anchorOrigin: {
+    vertical: "bottom",
+    horizontal: "left"
+  },
+  getContentAnchorEl: null,
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
@@ -69,10 +79,10 @@ function DynamicOptions (props) {
     const theme = useTheme();
 
     return (
-
       <FormControl className={classes.formControl}>
         <InputLabel id="demo-mutiple-chip-label">{props.label}</InputLabel>
         <Select
+          variant="filled"
           labelId="demo-mutiple-chip-label"
           id="demo-mutiple-chip"
           multiple
@@ -182,11 +192,10 @@ export default function JobsForm(props) {
       .catch((err) => console.log(err));
   };
   return (
-      <Grid container spacing={1} direction="row">
-        <div className={classes.root}>
+      <Grid container spacing={1} direction="column" xs={5} className={classes.root}>
         <SearchInput
           value={url}
-          placeholder='input url here...'
+          label="URL"
           onChange={(e) => {
             console.log(e.target.value)
             return setUrl(e.target.value)
@@ -219,7 +228,7 @@ export default function JobsForm(props) {
 
       </FormControl>
       <FormControl className={classes.formControl}>
-        <InputLabel id="demo-mutiple-chip-label">Dynamic</InputLabel>
+        <InputLabel id="demo-mutiple-chip-label">Dynamic options</InputLabel>
         <Select
           labelId="demo-mutiple-chip-label"
           id="demo-mutiple-chip"
@@ -275,12 +284,7 @@ export default function JobsForm(props) {
         </Select>
       </FormControl>*/}
         <DynamicOptions label="Job Options" optionsVal={jobOptions} options={props.jobOptions} handleAdd={handleJobOptionAdd} handleChange={handleJobParamChange} />
-        <Button variant="contained"
-        onClick={ postDataHandler}
-        >
-          Add Job
-        </Button>
-        </div>
+        <Button className={`${classes.Button} ${classes.addButton}`} variant="outlined" onClick={ postDataHandler}>Add Job</Button>
       </Grid>
   );
 }

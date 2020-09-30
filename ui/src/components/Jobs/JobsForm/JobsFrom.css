@@ -1,0 +1,7 @@
+.MuiSelect-iconFilled {
+  right: 0px !important;
+}
+
+.MuiSelect-root:focus {
+  color: #75B04E !important;
+}
