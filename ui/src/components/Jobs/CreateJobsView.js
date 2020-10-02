@@ -41,8 +41,8 @@ const useStyles = makeStyles((theme) => ({
     height: theme.spacing(0.4)
   },
   margin: {
-    marginBottom: theme.spacing(9),
-    marginTop: theme.spacing(9),
+    marginBottom: theme.spacing(2),
+    marginTop: theme.spacing(2),
   },
   NavTabs: {
     backgroundColor:'red'

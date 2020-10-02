@@ -5,3 +5,8 @@
 .MuiSelect-root:focus {
   color: #75B04E !important;
 }
+
+.makeStyles-formControl-20 {
+  width: 100%;
+}
+

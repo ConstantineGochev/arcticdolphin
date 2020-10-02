@@ -33,17 +33,7 @@ export default function Dashboard() {
         Dashboard
       </Typography>
       <Grid container spacing={1} direction="row">
-        {/* <Grid item xs={3}>
-          <Grid item>
-            <SearchInput />
-          </Grid>
-          <Grid item>
-            <CheckboxesGroup />
-          </Grid>
-        </Grid>
-        <Grid item xs={9}>
-          <EnhancedTableHead />
-        </Grid> */}
+        
       </Grid>
     </div>
   );
