@@ -4,35 +4,36 @@ import { makeStyles, useTheme } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import SearchInput from "../../Jobs/SearchInput/SearchInput";
 import Button from "@material-ui/core/Button";
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import Chip from '@material-ui/core/Chip';
-import Input from '@material-ui/core/Input';
-import './JobsFrom.css';
+import FormControl from "@material-ui/core/FormControl";
+import Select from "@material-ui/core/Select";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import Chip from "@material-ui/core/Chip";
+import Input from "@material-ui/core/Input";
+import Typography from "@material-ui/core/Typography";
+import "./JobsFrom.css";
 
 const useStyles = makeStyles((theme) => ({
   Button: {
-    width: '25%',
-    fontWeight: 'bold',
-    borderRadius: '20px',
-    textTransform: "none"
+    width: "25%",
+    fontWeight: "bold",
+    borderRadius: "20px",
+    textTransform: "none",
   },
   root: {
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    '& > *': {
+    marginLeft: "auto",
+    marginRight: "auto",
+    "& > *": {
       margin: theme.spacing(1),
-    }
+    },
   },
   addButton: {
-    color: '#75B04E',
-    fontSize: '1rem',
+    color: "#75B04E",
+    fontSize: "1rem",
     border: "2px solid #75B04E",
     marginTop: theme.spacing(10),
-    marginLeft: 'auto',
-    marginRight: 'auto'     
+    marginLeft: "auto",
+    marginRight: "auto",
   },
   formControl: {
     marginTop: theme.spacing(1),
@@ -40,8 +41,8 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 120,
   },
   chips: {
-    display: 'flex',
-    flexWrap: 'wrap',
+    display: "flex",
+    flexWrap: "wrap",
   },
   chip: {
     margin: 2,
@@ -49,13 +50,39 @@ const useStyles = makeStyles((theme) => ({
   noLabel: {
     marginTop: theme.spacing(3),
   },
+  optionsContainer: {
+    marginTop: theme.spacing(1),
+    // background: '#eee'
+  },
+  optionForm: {
+    display: 'flex',
+    justifyContent: 'space-evenly',
+    margin: '0.5%',
+  },
+  optionInput: {
+    fontSize: '0.8rem',
+    width: '75%',
+    height: '100%',
+  },
+  addOptionBtn: {
+    fontSize: '0.7rem',
+    height: '100%',
+    margin: '0',
+    marginLeft: theme.spacing(1),
+    width: '2rem',
+    padding: '0',
+  },
+  Typography: {
+    fontSize: '1rem',
+    paddingLeft: theme.spacing(2)
+  }
 }));
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
   anchorOrigin: {
     vertical: "bottom",
-    horizontal: "left"
+    horizontal: "left",
   },
   getContentAnchorEl: null,
   PaperProps: {
@@ -65,6 +92,7 @@ const MenuProps = {
     },
   },
 };
+
 function getStyles(option, opts, theme) {
   return {
     fontWeight:
@@ -73,44 +101,38 @@ function getStyles(option, opts, theme) {
         : theme.typography.fontWeightMedium,
   };
 }
-function DynamicOptions (props) {
 
-    const classes = useStyles();
-    const theme = useTheme();
+function DynamicOptions(props) {
+  const classes = useStyles();
+  const theme = useTheme();
 
-    return (
-      <FormControl className={classes.formControl}>
-        <InputLabel id="demo-mutiple-chip-label">{props.label}</InputLabel>
-        <Select
-          variant="filled"
-          labelId="demo-mutiple-chip-label"
-          id="demo-mutiple-chip"
-          multiple
-          value={props.optionsVal}
-          input={<Input id="select-multiple-chip" />}
-          renderValue={(selected) => (
-            <div className={classes.chips}>
-              {
-                  props.optionsVal.map((value, i) => {
-                    return <Chip key={i} label={value} className={classes.chip} />
-                  })
-              }
-            </div>
-          )}
-          MenuProps={MenuProps}
+  return (
+    <FormControl className={classes.formControl}>
+      <Typography className={classes.Typography}  align="left"> Job Options </Typography>
+      {Object.keys(props.options).map((option, i) => (
+        <form
+          key={i}
+          className={classes.optionForm}
+          option={props.options[option]}
+          onSubmit={props.handleAdd}
         >
-          {Object.keys(props.options).map((option, i) => (
-            <form key={i} style={{display: 'flex'}} option={props.options[option]} onSubmit={props.handleAdd}>
-                <Input disabled value={option} option={props.options[option]} />
-                <Input onChange={props.handleChange}/>
-                <Input type="submit" value="Add" />
-            </form>
-          ))}
-        </Select>
-      </FormControl>
-
-    )
-
+          <Input
+            placeholder={option}
+            option={props.options[option]}
+            onChange={props.handleChange}
+            className={classes.optionInput}
+          />
+          <Button
+            type="submit"
+            className={`${classes.Button} ${classes.addButton} ${classes.addOptionBtn}`}
+            variant="outlined"
+          >
+            Add
+          </Button>
+        </form>
+      ))}
+    </FormControl>
+  );
 }
 export default function JobsForm(props) {
   const classes = useStyles();
@@ -123,58 +145,61 @@ export default function JobsForm(props) {
   const [jobParam, setJobParam] = useState([]);
 
   function checkIfOptionExists(op) {
-      let exists = false
-      console.log('tool options = ',toolDynamicOptions)
-      toolDynamicOptions.map(tdop => {
-      console.log('tdop that blows = ', tdop);
-      const splitted = tdop.split(' ');
-      console.log("sliced = ",splitted)
-          if(op == splitted[0]) {
-            console.log('inside')
-            exists = true
-          }
-      })
-    return exists
-  }
-  function handleJobOptionAdd (e) {
-      e.preventDefault();
-
-  }
-
-  function handleDynamicOptionAdd (e) {
-      e.preventDefault();
-      const completeOption = e.target.getAttribute('option') + ' ' + toolDynamicParam;
-      const elemExists = checkIfOptionExists(e.target.getAttribute('option'))
-      console.log(elemExists)
-      if(!elemExists) {
-        console.log('first if');
-        setToolDynamicOptions(oldDynamicOptions => [...oldDynamicOptions, completeOption])
-      } else {
-          setToolDynamicOptions(oldDynamicOptions => {
-
-              const opt = e.target.getAttribute('option')
-              console.log(oldDynamicOptions)
-              for (let indx = 0; indx < oldDynamicOptions.length; indx++) {
-
-                  const splitOldOp = oldDynamicOptions[indx].split(' ')
-                  console.log('split old op = %s  opt = %s', splitOldOp[0], opt)
-                  if(opt == splitOldOp[0]) {
-                      oldDynamicOptions.splice(indx, 1)
-                      oldDynamicOptions.push(completeOption)
-                  }
-
-              }
-              return  oldDynamicOptions
-          })
+    let exists = false;
+    console.log("tool options = ", toolDynamicOptions);
+    toolDynamicOptions.map((tdop) => {
+      console.log("tdop that blows = ", tdop);
+      const splitted = tdop.split(" ");
+      console.log("sliced = ", splitted);
+      if (op == splitted[0]) {
+        console.log("inside");
+        exists = true;
       }
-      setToolDynamicParam('')
+    });
+    return exists;
   }
-  function handleDynamicParamChange (e) {
-        //console.log(e.target)
-        setToolDynamicParam(e.target.value)
+
+  function handleJobOptionAdd(e) {
+    e.preventDefault();
   }
-  function handleJobParamChange (e) {
-        setJobParam(e.target.value)
+
+  function handleDynamicOptionAdd(e) {
+    e.preventDefault();
+    const completeOption =
+      e.target.getAttribute("option") + " " + toolDynamicParam;
+    const elemExists = checkIfOptionExists(e.target.getAttribute("option"));
+    console.log(elemExists);
+    if (!elemExists) {
+      console.log("first if");
+      setToolDynamicOptions((oldDynamicOptions) => [
+        ...oldDynamicOptions,
+        completeOption,
+      ]);
+    } else {
+      setToolDynamicOptions((oldDynamicOptions) => {
+        const opt = e.target.getAttribute("option");
+        console.log(oldDynamicOptions);
+        for (let indx = 0; indx < oldDynamicOptions.length; indx++) {
+          const splitOldOp = oldDynamicOptions[indx].split(" ");
+          console.log("split old op = %s  opt = %s", splitOldOp[0], opt);
+          if (opt == splitOldOp[0]) {
+            oldDynamicOptions.splice(indx, 1);
+            oldDynamicOptions.push(completeOption);
+          }
+        }
+        return oldDynamicOptions;
+      });
+    }
+    setToolDynamicParam("");
+  }
+
+  function handleDynamicParamChange(e) {
+    //console.log(e.target)
+    setToolDynamicParam(e.target.value);
+  }
+
+  function handleJobParamChange(e) {
+    setJobParam(e.target.value);
   }
   const handleChangeStatic = (event) => {
     setToolStaticOptions(event.target.value);
@@ -182,109 +207,128 @@ export default function JobsForm(props) {
 
   function postDataHandler(event) {
     event.preventDefault();
-    console.log("Submiting...")
-    axios.post('http://localhost:8000/'+ props.tool+ '/add-job', {
+    console.log("Submiting...");
+    axios
+      .post("http://localhost:8000/" + props.tool + "/add-job", {
         url: url,
         toolOptions: toolStaticOptions.concat(toolDynamicOptions),
-        jobOptions: { delay: 5000 },
+        jobOptions: {
+          delay: 5000,
+        },
       })
       .then((res) => console.log(res))
       .catch((err) => console.log(err));
-  };
+  }
   return (
-      <Grid container spacing={1} direction="column" xs={5} className={classes.root}>
+    <React.Fragment>
+      <Grid
+        container
+        spacing={1}
+        direction="column"
+        xs={12}
+        className={classes.root}
+      >
         <SearchInput
           value={url}
           label="URL"
           onChange={(e) => {
-            console.log(e.target.value)
-            return setUrl(e.target.value)
+            console.log(e.target.value);
+            return setUrl(e.target.value);
           }}
         />
         <FormControl className={classes.formControl}>
-        <InputLabel id="demo-mutiple-chip-label">Static Options</InputLabel>
-        <Select
-          labelId="demo-mutiple-chip-label"
-          id="demo-mutiple-chip"
-          multiple
-          value={toolStaticOptions}
-          onChange={handleChangeStatic}
-          input={<Input id="select-multiple-chip" />}
-          renderValue={(selected) => (
-            <div className={classes.chips}>
-              {selected.map((value) => (
-                <Chip key={value} label={value} className={classes.chip} />
-              ))}
-            </div>
-          )}
-          MenuProps={MenuProps}
-        >
-          {Object.keys(props.staticOptions).map((staticOption, i) => (
-            <MenuItem key={i} value={props.staticOptions[staticOption]} style={getStyles(staticOption, toolStaticOptions, theme)}>
-              {staticOption}
-            </MenuItem>
-          ))}
-        </Select>
-
-      </FormControl>
-      <FormControl className={classes.formControl}>
-        <InputLabel id="demo-mutiple-chip-label">Dynamic options</InputLabel>
-        <Select
-          labelId="demo-mutiple-chip-label"
-          id="demo-mutiple-chip"
-          multiple
-          value={toolDynamicOptions}
-          input={<Input id="select-multiple-chip" />}
-          renderValue={(selected) => (
-            <div className={classes.chips}>
-              {
-                  toolDynamicOptions.map((value, i) => {
-                    return <Chip key={i} label={value} className={classes.chip} />
-                  })
-              }
-            </div>
-          )}
-          MenuProps={MenuProps}
-        >
-          {Object.keys(props.dynamicOptions).map((dynamicOption, i) => (
-            <form key={i} style={{display: 'flex'}} option={props.dynamicOptions[dynamicOption]} onSubmit={handleDynamicOptionAdd}>
-                <Input disabled value={dynamicOption} option={props.dynamicOptions[dynamicOption]} />
-                <Input onChange={handleDynamicParamChange}/>
-                <Input type="submit" value="Add" />
-            </form>
-          ))}
-        </Select>
-      </FormControl>
-    {/*<FormControl className={classes.formControl}>
-        <InputLabel id="demo-mutiple-chip-label">Job Options</InputLabel>
-        <Select
-          labelId="demo-mutiple-chip-label"
-          id="demo-mutiple-chip"
-          multiple
-          value={jobOptions}
-          input={<Input id="select-multiple-chip" />}
-          renderValue={(selected) => (
-            <div className={classes.chips}>
-              {
-                  jobOptions.map((value, i) => {
-                    return <Chip key={i} label={value} className={classes.chip} />
-                  })
-              }
-            </div>
-          )}
-          MenuProps={MenuProps}
-        >
-          {Object.keys(props.jobOptions).map((jobOption, i) => (
-            <form key={i} style={{display: 'flex'}} option={props.jobOptions[jobOption]} onSubmit={handleJobOptionAdd}>
-                <Input disabled value={jobOption} option={props.jobOptions[jobOption]} />
-                <Input onChange={handleJobParamChange}/>
-                <Input type="submit" value="Add" />
-            </form>
-          ))}
-        </Select>
-      </FormControl>*/}
-        <DynamicOptions label="Job Options" optionsVal={jobOptions} options={props.jobOptions} handleAdd={handleJobOptionAdd} handleChange={handleJobParamChange} />
-        <Button className={`${classes.Button} ${classes.addButton}`} variant="outlined" onClick={ postDataHandler}>Add Job</Button>
+          <InputLabel id="demo-mutiple-chip-label"> Static Options </InputLabel>
+          <Select
+            labelId="demo-mutiple-chip-label"
+            id="demo-mutiple-chip"
+            multiple
+            value={toolStaticOptions}
+            onChange={handleChangeStatic}
+            input={<Input id="select-multiple-chip" />}
+            renderValue={(selected) => (
+              <div className={classes.chips}>
+                {selected.map((value) => (
+                  <Chip key={value} label={value} className={classes.chip} />
+                ))}
+              </div>
+            )}
+            MenuProps={MenuProps}
+          >
+            {Object.keys(props.staticOptions).map((staticOption, i) => (
+              <MenuItem
+                key={i}
+                value={props.staticOptions[staticOption]}
+                style={getStyles(staticOption, toolStaticOptions, theme)}
+              >
+                {staticOption}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Grid>
+      <Grid
+        container
+        direction="row"
+        justify="space-evenly"
+        xs={12}
+        className={`${classes.root} ${classes.optionsContainer}`}
+      >
+        <Grid container xs={8} direction="row" justify="space-between">
+          <Grid item xs={12}>
+            <Typography className={classes.Typography} align="left"> Dynamic Options </Typography>
+          </Grid>
+
+          {Object.keys(props.dynamicOptions).map((dynamicOption, i) => (
+            <Grid item xs={6}>
+            <form
+              key={i}
+              option={props.dynamicOptions[dynamicOption]}
+              onSubmit={handleDynamicOptionAdd}
+              className={classes.optionForm}
+            >
+              <Input
+                placeholder={dynamicOption}
+                option={props.dynamicOptions[dynamicOption]}
+                onChange={handleDynamicParamChange}
+                className={classes.optionInput}
+              />
+              <Button
+                type="submit"
+                className={`${classes.Button} ${classes.addButton} ${classes.addOptionBtn}`}
+                variant="outlined"
+                onClick={postDataHandler}
+              >
+                Add
+              </Button>
+            </form>
+            </Grid>
+          ))}
+        </Grid>
+
+        <Grid item xs >
+          <DynamicOptions
+            optionsVal={jobOptions}
+            options={props.jobOptions}
+            handleAdd={handleJobOptionAdd}
+            handleChange={handleJobParamChange}
+          />
+          </Grid>
+          </Grid>
+          <Grid
+        container
+        spacing={1}
+        direction="column"
+        xs={12}
+        className={classes.root}
+      >
+          <Button
+            className={`${classes.Button} ${classes.addButton}`}
+            variant="outlined"
+            onClick={postDataHandler}
+          >
+            Add Job
+          </Button>
+        </Grid>
+    </React.Fragment>
   );
 }
