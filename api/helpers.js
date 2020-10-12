@@ -82,6 +82,7 @@ function verifyOptions(validOptions, requestOptions) {
 }
 
 function runExec(containerId, command, callback) {
+  console.log("run exec");
   var options = {
     Cmd: ['sh', '-c', command],
     AttachStdout: true,
@@ -89,6 +90,7 @@ function runExec(containerId, command, callback) {
   };
   const container = docker.getContainer(containerId)
   container.exec(options, function(err, exec) {
+    console.log(exec)
     if (err) return;
     exec.start(function(err, stream) {
       if (err) return;
@@ -122,7 +124,7 @@ function containerDiscovery(callback) {
     docker.listContainers(function(err, containers) {
         let index = 0;
         while (index < containers.length) {
-            //console.log(containers)
+           // console.log(containers)
             let containerName = containers[index].Names[0].split('.')[0].substring(1);
             if (containersObj.hasOwnProperty(containerName)) {
                 containersObj[containerName].containers.push(containers[index].Id)
