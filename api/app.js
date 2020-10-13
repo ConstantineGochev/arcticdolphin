@@ -7,7 +7,7 @@ const redis = require('redis');
 const groupsClient = redis.createClient();
 
 module.exports = function( queuesObj) {
-    console.log(queuesObj)
+    //console.log(queuesObj)
 
     app.use(bodyParser.json())
     app.use(cors());
@@ -49,7 +49,9 @@ module.exports = function( queuesObj) {
         console.log(data);
         const validOptions = helpers.verifyOptions(helpers.youtubedlOptions, data.toolOptions)
         if (validOptions) {
-            queuesObj.youtubeQueue.add({url: data.url, options: data.toolOptions.join(' ')}, data.jobOptions);
+            console.log("job options = ", data.jobOptions);
+            //console.log(queuesObj.youtubeQueue.add({test: 'test'}))
+            queuesObj.youtubeQueue.add({url: data.url, options: data.toolOptions.join(' ')}/*, data.jobOptions*/);
             return res.send('success')
         } else {
             return res.json({error: "Invalid options"})
@@ -58,6 +60,7 @@ module.exports = function( queuesObj) {
 
 
     app.get('/youtube-dl/jobs', function(req, res) {
+
         queuesObj.youtubeQueue.getJobs(['waiting', 'active', 'completed', 'failed', 'delayed']).then(function(jobs) {
               res.json(JSON.stringify(jobs))
         })

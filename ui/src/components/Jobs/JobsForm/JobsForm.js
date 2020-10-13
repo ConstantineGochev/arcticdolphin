@@ -11,6 +11,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Chip from "@material-ui/core/Chip";
 import Input from "@material-ui/core/Input";
 import Typography from "@material-ui/core/Typography";
+import Paper from "@material-ui/core/Paper";
 import "./JobsFrom.css";
 
 const useStyles = makeStyles((theme) => ({
@@ -75,7 +76,18 @@ const useStyles = makeStyles((theme) => ({
   Typography: {
     fontSize: '1rem',
     paddingLeft: theme.spacing(2)
-  }
+  },
+  chip: {
+    margin: theme.spacing(0.5),
+  },
+  chipRoot: {
+    display: 'flex',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    listStyle: 'none',
+    padding: theme.spacing(0.5),
+    margin: 0,
+  },
 }));
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -134,25 +146,23 @@ function DynamicOptions(props) {
     </FormControl>
   );
 }
+
 export default function JobsForm(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [url, setUrl] = useState("");
   const [toolDynamicOptions, setToolDynamicOptions] = useState([]);
   const [toolDynamicParam, setToolDynamicParam] = useState([]);
+  const [jobOptionParam, setJobOptionParam] = useState([]);
   const [toolStaticOptions, setToolStaticOptions] = useState([]);
   const [jobOptions, setJobOptions] = useState([]);
   const [jobParam, setJobParam] = useState([]);
 
-  function checkIfOptionExists(op) {
+  function checkIfOptionExists(op, opts) {
     let exists = false;
-    console.log("tool options = ", toolDynamicOptions);
-    toolDynamicOptions.map((tdop) => {
-      console.log("tdop that blows = ", tdop);
+    opts.map((tdop) => {
       const splitted = tdop.split(" ");
-      console.log("sliced = ", splitted);
       if (op == splitted[0]) {
-        console.log("inside");
         exists = true;
       }
     });
@@ -163,14 +173,44 @@ export default function JobsForm(props) {
     e.preventDefault();
   }
 
+  function handleJobOptionAdd(e) {
+    e.preventDefault();
+    const opt = e.target.getAttribute("option")
+    const completeOption = opt + " " + jobOptionParam;
+    console.log("complete job option = ", completeOption);
+    const elemExists = checkIfOptionExists(opt, jobOptions);
+
+    if (!elemExists) {
+      setJobOptions((oldJobOptions) => [
+        ...oldJobOptions,
+        completeOption,
+      ]);
+    } else {
+      setJobOptions((oldJobOptions) => {
+        const opt = e.target.getAttribute("option");
+        //console.log(oldDynamicOptions);
+        for (let indx = 0; indx < oldJobOptions.length; indx++) {
+          const splitOldOp = oldJobOptions[indx].split(" ");
+          //console.log("split old op = %s  opt = %s", splitOldOp[0], opt);
+          if (opt == splitOldOp[0]) {
+            oldJobOptions.splice(indx, 1);
+            oldJobOptions.push(completeOption);
+          }
+        }
+        return oldJobOptions;
+      });
+    }
+    setJobOptionParam("");
+
+  }
+
   function handleDynamicOptionAdd(e) {
     e.preventDefault();
-    const completeOption =
-      e.target.getAttribute("option") + " " + toolDynamicParam;
-    const elemExists = checkIfOptionExists(e.target.getAttribute("option"));
-    console.log(elemExists);
+    const opt = e.target.getAttribute("option")
+    const completeOption = opt + " " + toolDynamicParam;
+    const elemExists = checkIfOptionExists(opt, toolDynamicOptions);
+
     if (!elemExists) {
-      console.log("first if");
       setToolDynamicOptions((oldDynamicOptions) => [
         ...oldDynamicOptions,
         completeOption,
@@ -178,10 +218,10 @@ export default function JobsForm(props) {
     } else {
       setToolDynamicOptions((oldDynamicOptions) => {
         const opt = e.target.getAttribute("option");
-        console.log(oldDynamicOptions);
+        //console.log(oldDynamicOptions);
         for (let indx = 0; indx < oldDynamicOptions.length; indx++) {
           const splitOldOp = oldDynamicOptions[indx].split(" ");
-          console.log("split old op = %s  opt = %s", splitOldOp[0], opt);
+          //console.log("split old op = %s  opt = %s", splitOldOp[0], opt);
           if (opt == splitOldOp[0]) {
             oldDynamicOptions.splice(indx, 1);
             oldDynamicOptions.push(completeOption);
@@ -194,17 +234,52 @@ export default function JobsForm(props) {
   }
 
   function handleDynamicParamChange(e) {
-    //console.log(e.target)
     setToolDynamicParam(e.target.value);
   }
 
+
   function handleJobParamChange(e) {
-    setJobParam(e.target.value);
+    console.log(e.target.value)
+    setJobOptionParam(e.target.value);
   }
+
   const handleChangeStatic = (event) => {
     setToolStaticOptions(event.target.value);
   };
 
+  function handleDeleteDynamicOption(chipToDelete) {
+    setToolDynamicOptions((chips) => chips.filter((chip) => chip !== chipToDelete));
+  }
+  function handleDeleteJobOption(chipToDelete) {
+    setJobOptions((chips) => chips.filter((chip) => chip !== chipToDelete));
+  }
+  function renderDynamicOptionsChips() {
+    return toolDynamicOptions.map((dopt,i) => {
+      return  (
+        <li key={i}>
+            <Chip
+              label={dopt}
+              onDelete={() => handleDeleteDynamicOption(dopt)}
+              className={classes.chip}
+            />
+        </li>
+      )
+    })
+  }
+
+  function renderJobOptionsChips() {
+    return jobOptions.map((dopt,i) => {
+      return  (
+        <li key={i}>
+            <Chip
+              label={dopt}
+              onDelete={() => handleDeleteJobOption(dopt)}
+              className={classes.chip}
+            />
+        </li>
+      )
+    })
+  }
   function postDataHandler(event) {
     event.preventDefault();
     console.log("Submiting...");
@@ -273,15 +348,17 @@ export default function JobsForm(props) {
         xs={12}
         className={`${classes.root} ${classes.optionsContainer}`}
       >
-        <Grid container xs={8} direction="row" justify="space-between">
+        <Grid container xs={12} direction="row" justify="space-between">
+          <Paper component="ul" className={classes.chipRoot}>
+            {renderDynamicOptionsChips()}
+          </Paper>
           <Grid item xs={12}>
             <Typography className={classes.Typography} align="left"> Dynamic Options </Typography>
           </Grid>
 
           {Object.keys(props.dynamicOptions).map((dynamicOption, i) => (
-            <Grid item xs={6}>
+            <Grid item xs={6} key={i}>
             <form
-              key={i}
               option={props.dynamicOptions[dynamicOption]}
               onSubmit={handleDynamicOptionAdd}
               className={classes.optionForm}
@@ -296,25 +373,47 @@ export default function JobsForm(props) {
                 type="submit"
                 className={`${classes.Button} ${classes.addButton} ${classes.addOptionBtn}`}
                 variant="outlined"
-                onClick={postDataHandler}
               >
-                Add
+              Add
               </Button>
             </form>
             </Grid>
           ))}
         </Grid>
 
-        <Grid item xs >
-          <DynamicOptions
-            optionsVal={jobOptions}
-            options={props.jobOptions}
-            handleAdd={handleJobOptionAdd}
-            handleChange={handleJobParamChange}
-          />
+        <Grid container xs={12} direction="row" justify="space-between">
+          <Paper component="ul" className={classes.chipRoot}>
+            {renderJobOptionsChips()}
+          </Paper>
+          <Grid item xs={12}>
+            <Typography className={classes.Typography} align="left"> Job Options </Typography>
+          </Grid>
+          {Object.keys(props.jobOptions).map((jobOption, i) => (
+            <Grid item xs={6} key={i}>
+            <form
+              option={props.jobOptions[jobOption]}
+              onSubmit={handleJobOptionAdd}
+              className={classes.optionForm}
+            >
+              <Input
+                placeholder={jobOption}
+                option={props.jobOptions[jobOption]}
+                onChange={handleJobParamChange}
+                className={classes.optionInput}
+              />
+              <Button
+                type="submit"
+                className={`${classes.Button} ${classes.addButton} ${classes.addOptionBtn}`}
+                variant="outlined"
+              >
+              Add
+              </Button>
+            </form>
+            </Grid>
+          ))}
           </Grid>
           </Grid>
-          <Grid
+        <Grid
         container
         spacing={1}
         direction="column"
