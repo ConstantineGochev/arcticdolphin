@@ -32,12 +32,10 @@ const useStyles = makeStyles((theme) => ({
     color: "#75B04E",
     fontSize: "1rem",
     border: "2px solid #75B04E",
-    marginTop: theme.spacing(10),
     marginLeft: "auto",
     marginRight: "auto",
   },
   formControl: {
-    marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
     minWidth: 120,
   },
@@ -49,11 +47,8 @@ const useStyles = makeStyles((theme) => ({
     margin: 2,
   },
   noLabel: {
-    marginTop: theme.spacing(3),
   },
   optionsContainer: {
-    marginTop: theme.spacing(1),
-    // background: '#eee'
   },
   optionForm: {
     display: 'flex',
@@ -64,6 +59,10 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '0.8rem',
     width: '75%',
     height: '100%',
+
+    '&$active': {
+      color: '#000',
+    },
   },
   addOptionBtn: {
     fontSize: '0.7rem',
@@ -88,6 +87,11 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(0.5),
     margin: 0,
   },
+  chipList: {
+    display: 'flex',
+    listStyleType: 'none',
+    flexWrap: 'wrap'
+  }
 }));
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -300,7 +304,6 @@ export default function JobsForm(props) {
         container
         spacing={1}
         direction="column"
-        xs={12}
         className={classes.root}
       >
         <SearchInput
@@ -345,19 +348,25 @@ export default function JobsForm(props) {
         container
         direction="row"
         justify="space-evenly"
-        xs={12}
         className={`${classes.root} ${classes.optionsContainer}`}
       >
-        <Grid container xs={12} direction="row" justify="space-between">
-          <Paper component="ul" className={classes.chipRoot}>
+        <Grid container direction="row">
+          {/* <Paper component="ul" className={classes.chipRoot}> */}
+          <Grid item xs={12} className={classes.chipList}>
+
             {renderDynamicOptionsChips()}
-          </Paper>
-          <Grid item xs={12}>
-            <Typography className={classes.Typography} align="left"> Dynamic Options </Typography>
           </Grid>
+          {
+            Object.keys(props.dynamicOptions).length > 0 ? 
+              <Grid item xs={12}>
+                <Typography className={classes.Typography} align="left"> Dynamic Options </Typography>
+              </Grid>
+              :
+              null
+          }
 
           {Object.keys(props.dynamicOptions).map((dynamicOption, i) => (
-            <Grid item xs={6} key={i}>
+            <Grid item xs={4} key={i}>
             <form
               option={props.dynamicOptions[dynamicOption]}
               onSubmit={handleDynamicOptionAdd}
@@ -381,15 +390,17 @@ export default function JobsForm(props) {
           ))}
         </Grid>
 
-        <Grid container xs={12} direction="row" justify="space-between">
-          <Paper component="ul" className={classes.chipRoot}>
+        <Grid container direction="row">
+        <Grid item xs={12} className={classes.chipList}>
+
             {renderJobOptionsChips()}
-          </Paper>
+          </Grid>
+          {/* </Paper> */}
           <Grid item xs={12}>
             <Typography className={classes.Typography} align="left"> Job Options </Typography>
           </Grid>
           {Object.keys(props.jobOptions).map((jobOption, i) => (
-            <Grid item xs={6} key={i}>
+            <Grid item xs={4} key={i}>
             <form
               option={props.jobOptions[jobOption]}
               onSubmit={handleJobOptionAdd}

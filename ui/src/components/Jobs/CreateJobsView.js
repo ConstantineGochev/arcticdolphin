@@ -13,7 +13,7 @@ const {YOUTUBE_DL, RIP_ME, GALLERY_DL} = toolNames;
 const useStyles = makeStyles((theme) => ({
   root: {
     width: '90%',
-    minHeight: 'calc(100vh - 142px)',
+    minHeight: 'calc(100vh - 126px)',
     flexGrow: '1',
     marginLeft: 'auto',
     marginRight: 'auto',
@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   Typography: {
     paddingTop: theme.spacing(3),
     paddingLeft: theme.spacing(1),
-    marginBottom: theme.spacing(3),
+    marginBottom: theme.spacing(1),
     textAlign: "left",
     borderBottom: "1px solid #575757",
   },
@@ -41,16 +41,22 @@ const useStyles = makeStyles((theme) => ({
     height: theme.spacing(0.4)
   },
   margin: {
-    marginBottom: theme.spacing(2),
-    marginTop: theme.spacing(2),
+    
   },
   NavTabs: {
-    backgroundColor:'red'
+    // backgroundColor:'red'
+  },
+  TabPanel: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    minHeight: 'calc(100vh - 222px)'
   }
 }));
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
+  const classes = useStyles();
 
   return (
     <div
@@ -58,10 +64,11 @@ function TabPanel(props) {
       hidden={value !== index}
       id={`nav-tabpanel-${index}`}
       aria-labelledby={`nav-tab-${index}`}
+      
       {...other}
     >
       {value === index && (
-        <Box p={3}>
+        <Box p={3} className={classes.TabPanel}>
           {children}
         </Box>
       )}
@@ -117,19 +124,19 @@ function NavTabs() {
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
-        <Typography variant="h3" className={classes.margin}>
+        <Typography variant="h4">
             YoutubeDl
         </Typography>
         <JobsForm tool={YOUTUBE_DL} dynamicOptions={youtubedlDynamicOptions} staticOptions={youtubedlStaticOptions} jobOptions={jobOptions} />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <Typography variant="h3" className={classes.margin}>
+        <Typography variant="h4">
             RipMe
         </Typography>
         <JobsForm tool={RIP_ME} staticOptions={ripmeStaticOptions} dynamicOptions={[]} jobOptions={jobOptions}/>
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <Typography variant="h3" className={classes.margin}>
+        <Typography variant="h4">
             GalleryDl
         </Typography>
         <JobsForm tool={GALLERY_DL} staticOptions={[]} dynamicOptions={[]} jobOptions={jobOptions}/>

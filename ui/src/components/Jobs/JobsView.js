@@ -67,10 +67,10 @@ export default function JobsView() {
       </Typography>
       <Grid container spacing={1} direction="row">
         <Grid item xs={3}>
-          <Grid item className={classes.item}>
+          <Grid item xs className={classes.item}>
             <SearchInput label="Search"/>
           </Grid>
-          <Grid item className={classes.item}>
+          <Grid item xs className={classes.item}>
           <CheckboxesGroup selectedTool={selectedTool} handleClick={handleClick} />
          </Grid>
         </Grid>
