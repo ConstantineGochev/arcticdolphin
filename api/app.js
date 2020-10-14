@@ -21,8 +21,29 @@ module.exports = function( queuesObj) {
         res.json(JSON.stringify(dirs))
 
     })
+    /*
+     *{
+     *  name: string
+     *  youtubeDynamicOptions: array
+     *  youtubeStaticOptions: array
+     *  ripmeDynamicOptions: array
+     *  ripmeStaticOptions: array
+     *  galleryDynamicOptions: array
+     *  galleryStaticOptions: array
+     *  jobOptions: array
+     *}
+     */
     app.post('/groups/create', function(req, res) {
+      const { youtubeDynamicOptions,youtubeStaticOptions,ripmeDynamicOptions, ripmeStaticOptions, galleryDynamicOptions, galleryStaticOptions, jobOptions } = req.body.group;
 
+
+      groupsClient.hmset(name, [ ["youtubeDynamicOptions", youtubeDynamicOptions.toString()], ["youtubeStaticOptions", youtubeStaticOptions.toString()],
+        ["ripmeDynamicOptions", ripmeDynamicOptions.toString()], ["ripmeStaticOptions", ripmeStaticOptions.toString()], ["galleryDynamicOptions", galleryDynamicOptions.toString()],
+        ["galleryStaticOptions", galleryStaticOptions.toString()], ["jobOptions", jobOptions.toString()] ], function(err, response) {
+            if (err) console.log('Err: ',err);
+
+            res.send('success')
+        })
 
     })
 
