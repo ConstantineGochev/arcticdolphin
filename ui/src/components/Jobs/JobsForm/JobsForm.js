@@ -118,36 +118,43 @@ function getStyles(option, opts, theme) {
   };
 }
 
-function DynamicOptions(props) {
+export function SharedOptions(props) {
   const classes = useStyles();
   const theme = useTheme();
 
   return (
-    <FormControl className={classes.formControl}>
-      <Typography className={classes.Typography}  align="left"> Job Options </Typography>
-      {Object.keys(props.options).map((option, i) => (
-        <form
-          key={i}
-          className={classes.optionForm}
-          option={props.options[option]}
-          onSubmit={props.handleAdd}
-        >
-          <Input
-            placeholder={option}
-            option={props.options[option]}
-            onChange={props.handleChange}
-            className={classes.optionInput}
-          />
-          <Button
-            type="submit"
-            className={`${classes.Button} ${classes.addButton} ${classes.addOptionBtn}`}
-            variant="outlined"
-          >
-            Add
-          </Button>
-        </form>
-      ))}
-    </FormControl>
+        <Grid container xs={12} direction="row" justify="space-between">
+          <Paper component="ul" className={classes.chipRoot}>
+            {props.renderChips()}
+          </Paper>
+          <Grid item xs={12}>
+            <Typography className={classes.Typography} align="left"> {props.type} Options </Typography>
+          </Grid>
+
+          {Object.keys(props.options).map((option, i) => (
+            <Grid item xs={6} key={i}>
+            <form
+              option={props.options[option]}
+              onSubmit={props.handleOptionAdd}
+              className={classes.optionForm}
+            >
+              <Input
+                placeholder={option}
+                option={props.options[option]}
+                onChange={props.handleParamChange}
+                className={classes.optionInput}
+              />
+              <Button
+                type="submit"
+                className={`${classes.Button} ${classes.addButton} ${classes.addOptionBtn}`}
+                variant="outlined"
+              >
+              Add
+              </Button>
+            </form>
+            </Grid>
+          ))}
+        </Grid>
   );
 }
 
@@ -160,7 +167,6 @@ export default function JobsForm(props) {
   const [jobOptionParam, setJobOptionParam] = useState([]);
   const [toolStaticOptions, setToolStaticOptions] = useState([]);
   const [jobOptions, setJobOptions] = useState([]);
-  const [jobParam, setJobParam] = useState([]);
 
   function checkIfOptionExists(op, opts) {
     let exists = false;
@@ -173,117 +179,76 @@ export default function JobsForm(props) {
     return exists;
   }
 
-  function handleJobOptionAdd(e) {
-    e.preventDefault();
-  }
-
-  function handleJobOptionAdd(e) {
+  function handleOptionAdd(e, param, setParam, options, setOptions) {
     e.preventDefault();
     const opt = e.target.getAttribute("option")
-    const completeOption = opt + " " + jobOptionParam;
-    console.log("complete job option = ", completeOption);
-    const elemExists = checkIfOptionExists(opt, jobOptions);
+    const completeOption = opt + " " + param;
+    const elemExists = checkIfOptionExists(opt, options);
 
     if (!elemExists) {
-      setJobOptions((oldJobOptions) => [
-        ...oldJobOptions,
+      setOptions((oldOptions) => [
+        ...oldOptions,
         completeOption,
       ]);
     } else {
-      setJobOptions((oldJobOptions) => {
+      setOptions((oldOptions) => {
         const opt = e.target.getAttribute("option");
-        //console.log(oldDynamicOptions);
-        for (let indx = 0; indx < oldJobOptions.length; indx++) {
-          const splitOldOp = oldJobOptions[indx].split(" ");
+
+        for (let indx = 0; indx < oldOptions.length; indx++) {
+          const splitOldOp = oldOptions[indx].split(" ");
           //console.log("split old op = %s  opt = %s", splitOldOp[0], opt);
           if (opt == splitOldOp[0]) {
-            oldJobOptions.splice(indx, 1);
-            oldJobOptions.push(completeOption);
+            oldOptions.splice(indx, 1);
+            oldOptions.push(completeOption);
           }
         }
-        return oldJobOptions;
+        return oldOptions;
       });
     }
-    setJobOptionParam("");
-
+    setParam("");
   }
 
-  function handleDynamicOptionAdd(e) {
-    e.preventDefault();
-    const opt = e.target.getAttribute("option")
-    const completeOption = opt + " " + toolDynamicParam;
-    const elemExists = checkIfOptionExists(opt, toolDynamicOptions);
-
-    if (!elemExists) {
-      setToolDynamicOptions((oldDynamicOptions) => [
-        ...oldDynamicOptions,
-        completeOption,
-      ]);
-    } else {
-      setToolDynamicOptions((oldDynamicOptions) => {
-        const opt = e.target.getAttribute("option");
-        //console.log(oldDynamicOptions);
-        for (let indx = 0; indx < oldDynamicOptions.length; indx++) {
-          const splitOldOp = oldDynamicOptions[indx].split(" ");
-          //console.log("split old op = %s  opt = %s", splitOldOp[0], opt);
-          if (opt == splitOldOp[0]) {
-            oldDynamicOptions.splice(indx, 1);
-            oldDynamicOptions.push(completeOption);
-          }
-        }
-        return oldDynamicOptions;
-      });
+  function handleParamChange(e, paramType) {
+    switch (paramType) {
+      case "dynamicParam":
+        setToolDynamicParam(e.target.value);
+        break;
+      case "jobParam":
+        setJobOptionParam(e.target.value);
+        break;
+      case "staticParam":
+        setToolStaticOptions(e.target.value);
+        break;
     }
-    setToolDynamicParam("");
-  }
-
-  function handleDynamicParamChange(e) {
-    setToolDynamicParam(e.target.value);
   }
 
 
-  function handleJobParamChange(e) {
-    console.log(e.target.value)
-    setJobOptionParam(e.target.value);
+  function handleDeleteOption(toDelete, type) {
+    switch (type) {
+      case "dynamicOptions":
+        setToolDynamicOptions((opts) => opts.filter((op) => op !== toDelete));
+        break;
+      case "jobOptions":
+        setJobOptions((opts) => opts.filter((op) => op !== toDelete));
+        break;
+    }
   }
 
-  const handleChangeStatic = (event) => {
-    setToolStaticOptions(event.target.value);
-  };
-
-  function handleDeleteDynamicOption(chipToDelete) {
-    setToolDynamicOptions((chips) => chips.filter((chip) => chip !== chipToDelete));
-  }
-  function handleDeleteJobOption(chipToDelete) {
-    setJobOptions((chips) => chips.filter((chip) => chip !== chipToDelete));
-  }
-  function renderDynamicOptionsChips() {
-    return toolDynamicOptions.map((dopt,i) => {
+  function renderOptionChips(options, type) {
+    return options.map((dopt,i) => {
       return  (
         <li key={i}>
             <Chip
               label={dopt}
-              onDelete={() => handleDeleteDynamicOption(dopt)}
+              onDelete={() => handleDeleteOption(dopt, type)}
               className={classes.chip}
             />
         </li>
       )
     })
+
   }
 
-  function renderJobOptionsChips() {
-    return jobOptions.map((dopt,i) => {
-      return  (
-        <li key={i}>
-            <Chip
-              label={dopt}
-              onDelete={() => handleDeleteJobOption(dopt)}
-              className={classes.chip}
-            />
-        </li>
-      )
-    })
-  }
   function postDataHandler(event) {
     event.preventDefault();
     console.log("Submiting...");
@@ -308,7 +273,7 @@ export default function JobsForm(props) {
       >
         <SearchInput
           value={url}
-          label="URL"
+          placeholder="URL"
           onChange={(e) => {
             console.log(e.target.value);
             return setUrl(e.target.value);
@@ -321,7 +286,7 @@ export default function JobsForm(props) {
             id="demo-mutiple-chip"
             multiple
             value={toolStaticOptions}
-            onChange={handleChangeStatic}
+            onChange={(e) => handleParamChange(e, "staticParam")}
             input={<Input id="select-multiple-chip" />}
             renderValue={(selected) => (
               <div className={classes.chips}>
@@ -350,6 +315,7 @@ export default function JobsForm(props) {
         justify="space-evenly"
         className={`${classes.root} ${classes.optionsContainer}`}
       >
+
         <Grid container direction="row">
           {/* <Paper component="ul" className={classes.chipRoot}> */}
           <Grid item xs={12} className={classes.chipList}>
@@ -423,6 +389,15 @@ export default function JobsForm(props) {
             </Grid>
           ))}
           </Grid>
+
+
+        <SharedOptions type="Dynamic" options={props.dynamicOptions} handleOptionAdd={(e) => handleOptionAdd(e,toolDynamicParam,setToolDynamicParam,toolDynamicOptions,setToolDynamicOptions)}
+        handleParamChange={(e) => handleParamChange(e, "dynamicParam")} renderChips={() => renderOptionChips(toolDynamicOptions, "dynamicOptions")} />
+
+        <SharedOptions type="Job" options={props.jobOptions} handleOptionAdd={(e) => handleOptionAdd(e,jobOptionParam,setJobOptionParam,jobOptions,setJobOptions)}
+        handleParamChange={(e) => handleParamChange(e, "jobParam")} renderChips={() => renderOptionChips(jobOptions, "jobOptions")} />
+
+
           </Grid>
         <Grid
         container

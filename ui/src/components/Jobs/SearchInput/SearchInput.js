@@ -25,6 +25,7 @@ export default function SearchInput(props) {
         defaultValue={props.label}
         inputProps={{ 'aria-label': 'naked' }}
         onChange={props.onChange}
+        {...props}
       />
   );
 }
