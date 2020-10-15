@@ -23,6 +23,43 @@ export const youtubedlStaticOptions = {
     'no part files write directly to output file': '--no-part',
 
 }
+export const galleryStaticOptions = {
+    'Activate quiet mode': '--quiet',
+    'Print various debugging information': '--verbose',
+    'Print URLs instead of downloading': '--get-urls',
+    'Print JSON information': '--dump-json',
+    'Simulate data extraction; do not download anything': '--simulate',
+    'Print a list of available keywords and example values for the given URL\'s': '--list-keywords',
+    'Print a list of available extractor modules': '--list-modules',
+    'Print a list of extractor classes with description, (sub)category and example URL': '--list-extractors',
+    'Write downloaded intermediary pages to files in the current directory to debug problems': '--write-pages',
+    'Do not use .part files': '--no-part',
+    'Do not skip downloads; overwrite existing files': '--no-skip',
+    'Do not set file modification times according to Last-Modified HTTP response headers': '--no-mtime',
+    'Do not download any files': '--no-download',
+    'Disable HTTPS certificate validation': '--no-check-certificate',
+    'Store downloaded files in a ZIP archive': '--zip',
+    'Convert Pixiv Ugoira to WebM (requires FFmpeg)': '--ugoira-conv',
+    'Convert Pixiv Ugoira to WebM in VP9 lossless mode': '--ugoira-conv-lossless',
+    'Write metadata to separate JSON files': '--write-metadata',
+    'Write image tags to separate text files': '--write-tags',
+    'Set file modification times according to \'date\' metadata': '--mtime-from-date',
+
+}
+export const galleryDynamicOptions = {
+    'Maximum download rate (e.g. 500k or 2.5M)': '--limit-rate',
+    'Maximum number of retries for failed HTTP requests or -1 for infinite retries (default: 4)': '--retries',
+    'Abort extractor run after N consecutive file downloads have been skipped, e.g. if files with the same filename already exist': '--abort',
+    'Timeout for HTTP connections (default: 30.0)': '--http-timeout',
+    'Number of seconds to sleep before each download': '--sleep',
+    'Do not download files smaller than SIZE (e.g. 500k or 2.5M)': '--filesize-min',
+    'Do not download files larger than SIZE (e.g. 500k or 2.5M)': '--filesize-max',
+    'Record all downloaded files in the archive file and skip downloading any file already in it.': '--download-archive',
+    'Index-range(s) specifying which images to download. For example \'5-10\' or \',3-5,10-\'': '--range',
+    'Like \', but applies to manga-chapters and other delegated URLs': '--chapter-range' ,
+    'Python expression controlling which images to download. Files for which the expression evaluates to False are ignored. Available keys are the filename-specific ones listed by \'-K\'. Example: --filter "image_width >= 1000 and rating in (\',\'\'q\')"': '--filter'           ,
+    'Like \', but applies to manga-chapters and other delegated URLs': '--chapter-filter'
+}
 export const youtubedlDynamicOptions = {
     'prefix for unqualified URLs': '--default-search' ,
     'Use the specified HTTP/HTTPS/SOCKS proxy': '--proxy' ,

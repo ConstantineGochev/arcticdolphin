@@ -118,7 +118,7 @@ function containerDiscovery(callback) {
         },
         'ripme': {
           containers: [],
-          run: (options, url) => produceCommand('java -jar ripme.jar', options, url)
+          run: (options, url) => produceCommand('java -jar ripme.jar', options, '--url ' +url)
         }
     }
     docker.listContainers(function(err, containers) {

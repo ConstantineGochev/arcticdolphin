@@ -40,7 +40,6 @@ export default function JobsView() {
 
   function fetchJobs(toolName, jobTypesArr) {
       axios.get('http://localhost:8000/' + toolName + '/' + 'jobs').then(function(response) {
-          console.log("RESPONSE = ",JSON.parse(response.data))
           setJobs(JSON.parse(response.data))
       }).catch(err => console.log(err))
 

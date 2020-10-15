@@ -12,7 +12,13 @@ import Chip from "@material-ui/core/Chip";
 import Input from "@material-ui/core/Input";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
+import MuiAlert from '@material-ui/lab/Alert';
+import Snackbar from "@material-ui/core/Snackbar";
 import "./JobsFrom.css";
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles((theme) => ({
   Button: {
@@ -167,6 +173,7 @@ export default function JobsForm(props) {
   const [jobOptionParam, setJobOptionParam] = useState([]);
   const [toolStaticOptions, setToolStaticOptions] = useState([]);
   const [jobOptions, setJobOptions] = useState([]);
+  const [sneckBar, setSneckBar] = useState(false);
 
   function checkIfOptionExists(op, opts) {
     let exists = false;
@@ -219,6 +226,9 @@ export default function JobsForm(props) {
       case "staticParam":
         setToolStaticOptions(e.target.value);
         break;
+      case "sneckBarClose":
+        setSneckBar(false);
+        break
     }
   }
 
@@ -252,15 +262,21 @@ export default function JobsForm(props) {
   function postDataHandler(event) {
     event.preventDefault();
     console.log("Submiting...");
+    const mappedJobOptions = jobOptions.map((opt) => opt.split(' ')).reduce((obj, item) => Object.assign(obj, { [item[0]]: item[1] }), {})
+
     axios
       .post("http://localhost:8000/" + props.tool + "/add-job", {
         url: url,
         toolOptions: toolStaticOptions.concat(toolDynamicOptions),
-        jobOptions: {
-          delay: 5000,
-        },
+        jobOptions: mappedJobOptions,
       })
-      .then((res) => console.log(res))
+      .then((resp) => {
+        console.log(resp)
+        if (resp.data === 'success') {
+          setUrl('')
+          setSneckBar(true)
+        }
+      })
       .catch((err) => console.log(err));
   }
   return (
@@ -316,81 +332,6 @@ export default function JobsForm(props) {
         className={`${classes.root} ${classes.optionsContainer}`}
       >
 
-        <Grid container direction="row">
-          {/* <Paper component="ul" className={classes.chipRoot}> */}
-          <Grid item xs={12} className={classes.chipList}>
-
-            {renderDynamicOptionsChips()}
-          </Grid>
-          {
-            Object.keys(props.dynamicOptions).length > 0 ? 
-              <Grid item xs={12}>
-                <Typography className={classes.Typography} align="left"> Dynamic Options </Typography>
-              </Grid>
-              :
-              null
-          }
-
-          {Object.keys(props.dynamicOptions).map((dynamicOption, i) => (
-            <Grid item xs={4} key={i}>
-            <form
-              option={props.dynamicOptions[dynamicOption]}
-              onSubmit={handleDynamicOptionAdd}
-              className={classes.optionForm}
-            >
-              <Input
-                placeholder={dynamicOption}
-                option={props.dynamicOptions[dynamicOption]}
-                onChange={handleDynamicParamChange}
-                className={classes.optionInput}
-              />
-              <Button
-                type="submit"
-                className={`${classes.Button} ${classes.addButton} ${classes.addOptionBtn}`}
-                variant="outlined"
-              >
-              Add
-              </Button>
-            </form>
-            </Grid>
-          ))}
-        </Grid>
-
-        <Grid container direction="row">
-        <Grid item xs={12} className={classes.chipList}>
-
-            {renderJobOptionsChips()}
-          </Grid>
-          {/* </Paper> */}
-          <Grid item xs={12}>
-            <Typography className={classes.Typography} align="left"> Job Options </Typography>
-          </Grid>
-          {Object.keys(props.jobOptions).map((jobOption, i) => (
-            <Grid item xs={4} key={i}>
-            <form
-              option={props.jobOptions[jobOption]}
-              onSubmit={handleJobOptionAdd}
-              className={classes.optionForm}
-            >
-              <Input
-                placeholder={jobOption}
-                option={props.jobOptions[jobOption]}
-                onChange={handleJobParamChange}
-                className={classes.optionInput}
-              />
-              <Button
-                type="submit"
-                className={`${classes.Button} ${classes.addButton} ${classes.addOptionBtn}`}
-                variant="outlined"
-              >
-              Add
-              </Button>
-            </form>
-            </Grid>
-          ))}
-          </Grid>
-
-
         <SharedOptions type="Dynamic" options={props.dynamicOptions} handleOptionAdd={(e) => handleOptionAdd(e,toolDynamicParam,setToolDynamicParam,toolDynamicOptions,setToolDynamicOptions)}
         handleParamChange={(e) => handleParamChange(e, "dynamicParam")} renderChips={() => renderOptionChips(toolDynamicOptions, "dynamicOptions")} />
 
@@ -413,6 +354,11 @@ export default function JobsForm(props) {
           >
             Add Job
           </Button>
+          <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'center'}} open={sneckBar} autoHideDuration={4000} onClose={(e) => handleParamChange(e, "sneckBarClose")}>
+            <Alert onClose={(e) => handleParamChange(e, "sneckBarClose")} severity="success">
+              You have successfully added a job!
+            </Alert>
+          </Snackbar>
         </Grid>
     </React.Fragment>
   );

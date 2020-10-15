@@ -48,7 +48,6 @@ helpers.containerDiscovery(function(containersObj){
 
         const ytBalanced = helpers.containerLoadBalance(containersObj.ytdl.containers)
         const b = ytBalanced();
-
         helpers.runExec(b, containersObj.ytdl.run(job.data.options, job.data.url), function(data){
               job.progress(100);
               done()
@@ -60,24 +59,19 @@ helpers.containerDiscovery(function(containersObj){
         const ripmeBalanced = helpers.containerLoadBalance(containersObj.ripme.containers)
         const b = ripmeBalanced();
         helpers.runExec(b, containersObj.ripme.run(job.data.options, job.data.url), function(data){
-           //console.log("data from callback = ", data)
            job.progress(100);
            done()
-       })
+      })
   });
 
   galleryQueue.process(function(job, done){
 
-    job.progress(42);
-
-    done();
-
-    done(new Error('error transcoding'));
-
-    done(null, { framerate: 29.5 /* etc... */ });
-
-    throw new Error('some unexpected error');
-  });
-
+        const gdlBalanced = helpers.containerLoadBalance(containersObj.gdl.containers)
+        const b = gdlBalanced();
+        helpers.runExec(b, containersObj.gdl.run(job.data.options, job.data.url), function(data){
+           job.progress(100);
+           done()
+       })
+  })
 })
 

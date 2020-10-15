@@ -72,7 +72,7 @@ module.exports = function( queuesObj) {
         if (validOptions) {
             console.log("job options = ", data.jobOptions);
             //console.log(queuesObj.youtubeQueue.add({test: 'test'}))
-            queuesObj.youtubeQueue.add({url: data.url, options: data.toolOptions.join(' ')}/*, data.jobOptions*/);
+            queuesObj.youtubeQueue.add({url: data.url, options: data.toolOptions.join(' ')}, data.jobOptions);
             return res.send('success')
         } else {
             return res.json({error: "Invalid options"})

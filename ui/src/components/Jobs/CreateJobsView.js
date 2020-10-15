@@ -7,7 +7,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import { toolNames, youtubedlStaticOptions, ripmeStaticOptions, youtubedlDynamicOptions, jobOptions } from '../../constants.js'
+import { toolNames, youtubedlStaticOptions, ripmeStaticOptions, youtubedlDynamicOptions, jobOptions, galleryStaticOptions, galleryDynamicOptions } from '../../constants.js'
 
 const {YOUTUBE_DL, RIP_ME, GALLERY_DL} = toolNames;
 const useStyles = makeStyles((theme) => ({
@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
     height: theme.spacing(0.4)
   },
   margin: {
-    
+
   },
   NavTabs: {
     // backgroundColor:'red'
@@ -64,7 +64,7 @@ function TabPanel(props) {
       hidden={value !== index}
       id={`nav-tabpanel-${index}`}
       aria-labelledby={`nav-tab-${index}`}
-      
+
       {...other}
     >
       {value === index && (
@@ -139,7 +139,7 @@ function NavTabs() {
         <Typography variant="h4">
             GalleryDl
         </Typography>
-        <JobsForm tool={GALLERY_DL} staticOptions={[]} dynamicOptions={[]} jobOptions={jobOptions}/>
+        <JobsForm tool={GALLERY_DL} staticOptions={galleryStaticOptions} dynamicOptions={galleryDynamicOptions} jobOptions={jobOptions}/>
       </TabPanel>
     </div>
   );
