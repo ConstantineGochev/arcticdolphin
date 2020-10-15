@@ -10,3 +10,11 @@
   width: 100%;
 }
 
+.MuiInput-underline:after {
+  border-bottom: 2px solid #75B04E !important;
+}
+
+.MuiFormLabel-root.Mui-focused {
+  color: #75B04E !important;
+}
+
