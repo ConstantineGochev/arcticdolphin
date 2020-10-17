@@ -124,12 +124,49 @@ function getStyles(option, opts, theme) {
   };
 }
 
+export function StaticOptions(props) {
+  const classes = useStyles();
+  const theme = useTheme();
+
+  return (
+    <FormControl className={classes.formControl}>
+    <InputLabel id="demo-mutiple-chip-label"> {props.name} Options </InputLabel>
+    <Select
+      labelId="demo-mutiple-chip-label"
+      id="demo-mutiple-chip"
+      multiple
+      value={props.value}
+      onChange={props.handleParamChange}
+      input={<Input id="select-multiple-chip" />}
+      renderValue={(selected) => (
+        <div className={classes.chips}>
+          {selected.map((value) => (
+            <Chip key={value} label={value} className={classes.chip} />
+          ))}
+        </div>
+      )}
+      MenuProps={MenuProps}
+    >
+      {Object.keys(props.options).map((staticOption, i) => (
+        <MenuItem
+          key={i}
+          value={props.options[staticOption]}
+          style={getStyles(staticOption, props.value, theme)}
+        >
+          {staticOption}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+  )
+}
+
 export function SharedOptions(props) {
   const classes = useStyles();
   const theme = useTheme();
 
   return (
-        <Grid container xs={12} direction="row" justify="space-between">
+        <Grid container xs={12} direction="row" justify="space-between" style={{marginBottom: '15px'}}>
           <Paper component="ul" className={classes.chipRoot}>
             {props.renderChips()}
           </Paper>
@@ -173,8 +210,15 @@ export default function JobsForm(props) {
   const [jobOptionParam, setJobOptionParam] = useState([]);
   const [toolStaticOptions, setToolStaticOptions] = useState([]);
   const [jobOptions, setJobOptions] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [selectedGroup, setSelectedGroups] = useState('')
   const [sneckBar, setSneckBar] = useState(false);
 
+  useEffect(function() {
+    console.log("in use effect")
+    fetchJGroups()
+  }, [])
+  
   function checkIfOptionExists(op, opts) {
     let exists = false;
     opts.map((tdop) => {
@@ -216,22 +260,32 @@ export default function JobsForm(props) {
   }
 
   function handleParamChange(e, paramType) {
+    const val = e.target.value
     switch (paramType) {
       case "dynamicParam":
-        setToolDynamicParam(e.target.value);
+        setToolDynamicParam(val);
         break;
       case "jobParam":
-        setJobOptionParam(e.target.value);
+        setJobOptionParam(val);
         break;
       case "staticParam":
-        setToolStaticOptions(e.target.value);
+        setToolStaticOptions(val);
+        break;
+      case "groupParam":
+          setSelectedGroups(val)
         break;
       case "sneckBarClose":
         setSneckBar(false);
         break
     }
   }
+  function fetchJGroups() {
+    axios.get("http://localhost:8000/groups").then(res => {
+        console.log(res.data)
+        setGroups(res.data)
+    }).catch(err => console.log(err))
 
+  }
 
   function handleDeleteOption(toDelete, type) {
     switch (type) {
@@ -263,9 +317,13 @@ export default function JobsForm(props) {
     event.preventDefault();
     console.log("Submiting...");
     const mappedJobOptions = jobOptions.map((opt) => opt.split(' ')).reduce((obj, item) => Object.assign(obj, { [item[0]]: item[1] }), {})
-
+    if (selectedGroup !== '') {
+      var group = groups.find(gr => gr.name === selectedGroup)
+    }
+    console.log(group)
     axios
       .post("http://localhost:8000/" + props.tool + "/add-job", {
+        group: group,
         url: url,
         toolOptions: toolStaticOptions.concat(toolDynamicOptions),
         jobOptions: mappedJobOptions,
@@ -295,35 +353,36 @@ export default function JobsForm(props) {
             return setUrl(e.target.value);
           }}
         />
-        <FormControl className={classes.formControl}>
-          <InputLabel id="demo-mutiple-chip-label"> Static Options </InputLabel>
-          <Select
-            labelId="demo-mutiple-chip-label"
-            id="demo-mutiple-chip"
-            multiple
-            value={toolStaticOptions}
-            onChange={(e) => handleParamChange(e, "staticParam")}
-            input={<Input id="select-multiple-chip" />}
-            renderValue={(selected) => (
-              <div className={classes.chips}>
-                {selected.map((value) => (
-                  <Chip key={value} label={value} className={classes.chip} />
-                ))}
-              </div>
-            )}
-            MenuProps={MenuProps}
-          >
-            {Object.keys(props.staticOptions).map((staticOption, i) => (
-              <MenuItem
-                key={i}
-                value={props.staticOptions[staticOption]}
-                style={getStyles(staticOption, toolStaticOptions, theme)}
-              >
-                {staticOption}
-              </MenuItem>
-            ))}
-          </Select>
+    <FormControl className={classes.formControl}>
+    <InputLabel id="demo-mutiple-chip-label"> Group </InputLabel>
+    <Select
+      labelId="demo-mutiple-chip-label"
+      id="demo-mutiple-chip"
+      value={selectedGroup}
+      onChange={(e) => handleParamChange(e, "groupParam")}
+      input={<Input id="select-multiple-chip" />}
+      MenuProps={MenuProps}
+       >
+        <MenuItem
+             value=''
+        >
+          None
+        </MenuItem>
+      {groups.map((gr, i) => {
+        console.log(gr)
+        return (
+           <MenuItem
+              key={i}
+             value={gr.name}
+             style={getStyles(gr.name, selectedGroup, theme)}
+           >
+           {gr.name}
+          </MenuItem>
+           )})}
+           
+         </Select>
         </FormControl>
+        <StaticOptions name="Static" value={toolStaticOptions} handleParamChange={(e) => handleParamChange(e, "staticParam")} options={props.staticOptions} />
       </Grid>
       <Grid
         container

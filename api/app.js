@@ -3,8 +3,11 @@ const app = express();
 const helpers = require('./helpers');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const redis = require('redis');
-const groupsClient = redis.createClient();
+const {
+    scanAll,
+    groupsClient,
+    jobOptions
+} = require('./helpers')
 
 module.exports = function( queuesObj) {
     //console.log(queuesObj)
@@ -34,45 +37,54 @@ module.exports = function( queuesObj) {
      *}
      */
     app.post('/groups/create', function(req, res) {
-      const { youtubeDynamicOptions,youtubeStaticOptions,ripmeDynamicOptions, ripmeStaticOptions, galleryDynamicOptions, galleryStaticOptions, jobOptions } = req.body.group;
+      const { youtubeOptions,ripmeOptions, galleryOptions, jobOptions, name } = req.body;
+      console.log(youtubeOptions.join(' '))
 
-
-      groupsClient.hmset(name, [ ["youtubeDynamicOptions", youtubeDynamicOptions.toString()], ["youtubeStaticOptions", youtubeStaticOptions.toString()],
-        ["ripmeDynamicOptions", ripmeDynamicOptions.toString()], ["ripmeStaticOptions", ripmeStaticOptions.toString()], ["galleryDynamicOptions", galleryDynamicOptions.toString()],
-        ["galleryStaticOptions", galleryStaticOptions.toString()], ["jobOptions", jobOptions.toString()] ], function(err, response) {
+      groupsClient.hmset('group:'+ name, [ "youtubeOptions", youtubeOptions.join(' '),
+        "ripmeOptions", ripmeOptions.join(' '), "galleryOptions", galleryOptions.join(' '),
+        "jobOptions", jobOptions.join(' ') ], function(err, response) {
             if (err) console.log('Err: ',err);
-
-            res.send('success')
+            if(response === 'OK') {
+              res.send('success')
+            }
         })
 
     })
 
-    app.delete('/groups/delete', function(req, res) {
-
-
+    app.delete(['/groups/delete/:name', '/groups/delete/'], function(req, res) {
+      const param = req.params.name !== undefined ?  req.params.name : ''
+      groupsClient.del('group:'+ param, function(err, resp) {
+        if (err) console.log(err)
+        console.log(resp)
+        res.send('success')
+      })
     })
 
-    app.get('/groups/', function(req, res) {
-
-
+    app.get('/groups', async function(req, res) {
+      const groups = await scanAll('group:*')
+      res.json(groups)
     })
 
-    app.get('/groups/:groupname', function(req, res) {
-
-
-    })
-    app.put('/groups/update', function(req, res) {
-
-
-    })
     app.post('/youtube-dl/add-job', function(req, res) {
         const data = req.body
         console.log(data);
         const validOptions = helpers.verifyOptions(helpers.youtubedlOptions, data.toolOptions)
+        var toolOptions, jobOpts;
+        if (data.group) {
+          toolOptions = data.group.youtubeOptions
+          jobOpts = data.group.jobOptions.split(' ').reduce((obj, item,indx, src) => {
+            if (jobOptions.includes(item)) {
+              return Object.assign(obj, { [item]: src[indx +1] })
+            } else {
+              return Object.assign(obj, {})
+            }
+          }, {})
+        } else {
+          toolOptions = data.toolOptions.join(' ')
+          jobOps = data.jobOptions
+        }
         if (validOptions) {
-            console.log("job options = ", data.jobOptions);
-            //console.log(queuesObj.youtubeQueue.add({test: 'test'}))
-            queuesObj.youtubeQueue.add({url: data.url, options: data.toolOptions.join(' ')}, data.jobOptions);
+            queuesObj.youtubeQueue.add({url: data.url, options: toolOptions}, jobOpts);
             return res.send('success')
         } else {
             return res.json({error: "Invalid options"})
@@ -92,8 +104,23 @@ module.exports = function( queuesObj) {
         const data = req.body
         console.log(data)
         const validOptions = helpers.verifyOptions(helpers.ripmeStaticOptions , data.toolOptions)
+
+        var toolOptions, jobOpts;
+        if (data.group) {
+          toolOptions = data.group.ripmeOptions
+          jobOpts = data.group.jobOptions.split(' ').reduce((obj, item,indx, src) => {
+            if (jobOptions.includes(item)) {
+              return Object.assign(obj, { [item]: src[indx +1] })
+            } else {
+              return Object.assign(obj, {})
+            }
+          }, {})
+        } else {
+          toolOptions = data.toolOptions.join(' ')
+          jobOps = data.jobOptions
+        }
         if (validOptions) {
-            queuesObj.ripmeQueue.add({url: data.url, options: data.toolOptions.join(' ')}, data.jobOptions);
+            queuesObj.ripmeQueue.add({url: data.url, options:toolOptions}, jobOpts);
             res.send('success')
         }
 
@@ -111,7 +138,22 @@ module.exports = function( queuesObj) {
     app.post('/gallery-dl/add-job', function(req, res) {
 
         const data = req.body
-        queuesObj.galleryQueue.add({url: data.url, options: data.toolOptions.join(' ')}, data.jobOptions);
+
+        var toolOptions, jobOpts;
+        if (data.group) {
+          toolOptions = data.group.galleryOptions
+          jobOpts = data.group.jobOptions.split(' ').reduce((obj, item,indx, src) => {
+            if (jobOptions.includes(item)) {
+              return Object.assign(obj, { [item]: src[indx +1] })
+            } else {
+              return Object.assign(obj, {})
+            }
+          }, {})
+        } else {
+          toolOptions = data.toolOptions.join(' ')
+          jobOps = data.jobOptions
+        }
+        queuesObj.galleryQueue.add({url: data.url, options: data.toolOptions}, jobOps);
         res.send('success')
 
     })

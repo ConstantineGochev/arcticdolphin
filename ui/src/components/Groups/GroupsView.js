@@ -1,139 +1,219 @@
-import React, { useState }from "react";
+import React, {useState, useEffect} from "react";
+import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import EnhancedTableHead from "../Jobs/Table/Table";
-import CheckboxesGroup from "../Jobs/GroupsList/GroupsList";
-import Snackbar from "@material-ui/core/Snackbar";
-import Chip from "@material-ui/core/Chip";
-import SearchInput from "../Jobs/SearchInput/SearchInput";
+import Table from "@material-ui/core/Table";
+import Button from "@material-ui/core/Button";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableHead from "@material-ui/core/TableHead";
+import TableRow from "@material-ui/core/TableRow";
+import TablePagination from "@material-ui/core/TablePagination";
 import Grid from "@material-ui/core/Grid";
-import { SharedOptions } from '../Jobs/JobsForm/JobsForm'
-import { toolNames, youtubedlStaticOptions, ripmeStaticOptions, youtubedlDynamicOptions, jobOptions, galleryStaticOptions, galleryDynamicOptions } from '../../constants.js'
+import axios from 'axios'
 
-import { makeStyles } from "@material-ui/core/styles";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    width: '90%',
-    minHeight: 'calc(100vh - 52px);',
-    flexGrow: '1',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    backgroundColor: '#F2F2F2',
-  },
-  Typography: {
-    paddingTop: theme.spacing(3),
-    paddingLeft: theme.spacing(1),
-    marginBottom: theme.spacing(3),
-    textAlign: "left",
-    borderBottom: "1px solid #575757",
-  },
-}));
 
+const StyledTableCell = withStyles((theme) => ({
+    head: {
+      backgroundColor: "#BFBFBF",
+      border: "2px solid black",
+      color: "black",
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontSize: "1.25rem",
+      width: "200px",
+      marginRight: theme.spacing(3),
+    },
+    body: {
+      fontSize: 14,
+    },
+  }))(TableCell);
+  
+  const StyledTableRow = withStyles((theme) => ({
+    root: {
+      border: "2px solid black",
+    },
+  }))(TableRow);
+  
+  const useStyles = makeStyles((theme) => ({
+    root: {
+        width: '90%',
+        minHeight: 'calc(100vh - 52px);',
+        flexGrow: '1',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        backgroundColor: '#F2F2F2',
+      },
+      item: {
+        display: 'flex',
+        flexDirection: 'column',
+        width: '80%'
+      },
+      Typography: {
+        paddingTop: theme.spacing(3),
+        paddingLeft: theme.spacing(1),
+        marginBottom: theme.spacing(3),
+        textAlign: "left",
+        borderBottom: "1px solid #575757",
+      },
+    table: {
+        width: '90%',
+        minWidth: 700,
+        marginLeft: 'auto',
+        marginRight: 'auto',
+    },
+    tableContainer: {
+      marginLeft: "-1.7rem",
+    },
+    tableCell: {
+      border: "2px solid black",
+      fontSize: "0.8rem",
+      padding: theme.spacing(0.5),
+    },
+    groupsTagCell: {
+      paddingLeft: theme.spacing(0.3),
+      paddingTop: theme.spacing(1.5),
+      display: "flex",
+      flexWrap: "wrap",
+      border: "none",
+      fontSize: "0.7rem",
+    },
+    dateCell: {
+      minWidth: "100px",
+    },
+    tableHead: {
+      width: "fit-content",
+      padding: theme.spacing(0.5),
+      fontSize: "1rem",
+    },
+    pagination: {
+      marginRight: theme.spacing(15),
+    }
+  }));
 export default function GroupsView() {
   const classes = useStyles();
-  const [toolDynamicOptions, setToolDynamicOptions] = useState([]);
-  const [toolDynamicParam, setToolDynamicParam] = useState([]);
-  const [jobOptionParam, setJobOptionParam] = useState([]);
-  const [toolStaticOptions, setToolStaticOptions] = useState([]);
-  const [jobOptions, setJobOptions] = useState([]);
-  const [sneckBar, setSneckBar] = useState(false);
+  const [groups, setGroups] = useState([]);
+  // Pagitation setup - start
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [page, setPage] = useState(0);
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    console.log(parseInt(event.target.value, 10))
+    setPage(0);
+  };
+  // Pagitation setup - end
+  function fetchJGroups() {
+    axios.get("http://localhost:8000/groups").then(res => {
 
-  function checkIfOptionExists(op, opts) {
-    let exists = false;
-    opts.map((tdop) => {
-      const splitted = tdop.split(" ");
-      if (op == splitted[0]) {
-        exists = true;
-      }
-    });
-    return exists;
+        setGroups(res.data)
+    }).catch(err => console.log(err))
+
   }
+  function handleDeleteGroup(name) {
+      console.log("delete ",name )
+      axios.delete(`http://localhost:8000/groups/delete/${name}`,{}).then(res => {
 
-  function handleOptionAdd(e, param, setParam, options, setOptions) {
-    e.preventDefault();
-    const opt = e.target.getAttribute("option")
-    const completeOption = opt + " " + param;
-    const elemExists = checkIfOptionExists(opt, options);
-
-    if (!elemExists) {
-      setOptions((oldOptions) => [
-        ...oldOptions,
-        completeOption,
-      ]);
-    } else {
-      setOptions((oldOptions) => {
-        const opt = e.target.getAttribute("option");
-
-        for (let indx = 0; indx < oldOptions.length; indx++) {
-          const splitOldOp = oldOptions[indx].split(" ");
-          //console.log("split old op = %s  opt = %s", splitOldOp[0], opt);
-          if (opt == splitOldOp[0]) {
-            oldOptions.splice(indx, 1);
-            oldOptions.push(completeOption);
-          }
+        console.log(res.data)
+        if (res.data == 'success') {
+            fetchJGroups();
         }
-        return oldOptions;
-      });
-    }
-    setParam("");
+    }).catch(err => console.log(err))
   }
 
-  function handleParamChange(e, paramType) {
-    switch (paramType) {
-      case "dynamicParam":
-        setToolDynamicParam(e.target.value);
-        break;
-      case "jobParam":
-        setJobOptionParam(e.target.value);
-        break;
-      case "staticParam":
-        setToolStaticOptions(e.target.value);
-        break;
-      case "sneckBarClose":
-        setSneckBar(false);
-        break
-    }
-  }
+  useEffect(function() {
+      console.log("in use effect")
+    fetchJGroups()
+  }, [])
 
-
-  function handleDeleteOption(toDelete, type) {
-    switch (type) {
-      case "dynamicOptions":
-        setToolDynamicOptions((opts) => opts.filter((op) => op !== toDelete));
-        break;
-      case "jobOptions":
-        setJobOptions((opts) => opts.filter((op) => op !== toDelete));
-        break;
-    }
-  }
-
-  function renderOptionChips(options, type) {
-    return options.map((dopt,i) => {
-      return  (
-        <li key={i}>
-            <Chip
-              label={dopt}
-              onDelete={() => handleDeleteOption(dopt, type)}
-              className={classes.chip}
-            />
-        </li>
-      )
-    })
-
-  }
   return (
     <div className={classes.root}>
+      {console.log('rendering')}
       <Typography variant="h4" className={classes.Typography}>
         Groups
       </Typography>
-      <Grid container spacing={1} direction="row">
-        <SharedOptions type="Dynamic" options={ youtubedlStaticOptions} handleOptionAdd={(e) => handleOptionAdd(e,toolDynamicParam,setToolDynamicParam,toolDynamicOptions,setToolDynamicOptions)}
-        handleParamChange={(e) => handleParamChange(e, "dynamicParam")} renderChips={() => renderOptionChips(toolDynamicOptions, "dynamicOptions")} />
+      <React.Fragment>
+      <TableContainer className={classes.tableContainer}>
+        <Table className={classes.table} aria-label="customized table">
+          <TableHead>
+            <TableRow>
+              <StyledTableCell className={classes.tableHead}>
+                Name
+              </StyledTableCell>
+              <StyledTableCell className={classes.tableHead}>
+                Youtube Options
+              </StyledTableCell>
+              <StyledTableCell className={classes.tableHead}>
+                Ripme Options
+              </StyledTableCell>
+              <StyledTableCell className={classes.tableHead}>
+                Gallery Options
+              </StyledTableCell>
+              <StyledTableCell className={classes.tableHead}>
+                Job Options
+              </StyledTableCell>
+              <StyledTableCell
+                className={classes.tableHead}
+                align="center"
+              >Actions</StyledTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+    
+              {groups.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row, i) => {
+                console.log(row)
+                return (
+                <StyledTableRow key={i}>
+                  <StyledTableCell component="th" scope="row" align="center">
+                    {row.name}
+                  </StyledTableCell>
+                  <StyledTableCell className={classes.tableCell}>
+                    {row.youtubeOptions}
+                  </StyledTableCell>
 
-        <SharedOptions type="Job" options={youtubedlDynamicOptions} handleOptionAdd={(e) => handleOptionAdd(e,jobOptionParam,setJobOptionParam,jobOptions,setJobOptions)}
-        handleParamChange={(e) => handleParamChange(e, "jobParam")} renderChips={() => renderOptionChips(jobOptions, "jobOptions")} />
+                  <StyledTableCell
+                    className={`${classes.tableCell} ${classes.dateCell}`}
+                  >
+                    {row.ripmeOptions}
+                    
+                  </StyledTableCell>
+                  <StyledTableCell
+                    className={`${classes.tableCell} ${classes.dateCell}`}
+                  >
+                    {row.galleryOptions}
+                    
+                  </StyledTableCell>
+                  <StyledTableCell
+                    className={`${classes.tableCell} ${classes.dateCell}`}
+                  >
+                    {row.jobOptions}
 
-      </Grid>
+                  </StyledTableCell>
+                  <StyledTableCell
+                    className={`${classes.tableCell} ${classes.dateCell}`}
+                  >
+                   <Button variant="contained" color="secondary" onClick={() => handleDeleteGroup(row.name)}>Delete</Button>
+
+                  </StyledTableCell>
+                </StyledTableRow>
+            )})}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={`${groups.length}`}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+        className={classes.pagination}
+      />
+    </React.Fragment>
     </div>
   );
 }

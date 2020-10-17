@@ -3,12 +3,23 @@ const docker = new Docker({socketPath: '/var/run/docker.sock'});
 const stream = require('stream');
 const FS = require('fs');
 const PATH = require('path');
+const { promisify } = require('util');
+const redis = require('redis');
+const groupsClient = redis.createClient();
+const scan = promisify(groupsClient.scan).bind(groupsClient);
+const hmget = promisify(groupsClient.hmget).bind(groupsClient);
 
 const constants = {
 	DIRECTORY: 'directory',
 	FILE: 'file'
 }
-
+const jobOptions = [
+    'delay',
+     'priority',
+    'every',
+     'limit',
+     'cron'
+]
 const youtubedlOptions = [
      '-i',
      '--abort-on-error',
@@ -77,6 +88,28 @@ const ripmeStaticOptions = [
   '--overwrite'
 ]
 
+const scanAll = async (pattern) => {
+  const found = [];
+  const allGroups = [];
+  let cursor = '0';
+  let indx = 0;
+
+  do {
+    const reply = await scan(cursor, 'MATCH', pattern);
+    cursor = reply[0];
+    if (reply[1][0] !==  undefined && reply[1][0] !== "") {
+      found.push(reply[1][0]);
+    }
+  } while (cursor !== '0');
+
+  while (indx < found.length) {
+    let values = await hmget(found[indx], ["youtubeOptions", "ripmeOptions", "galleryOptions", "jobOptions"])
+    let obj = {"name": found[indx].split(':')[1],"youtubeOptions": values[0], "ripmeOptions": values[1], "galleryOptions": values[2], "jobOptions": values[3]}
+    allGroups.push(obj)
+    indx++
+  }
+  return allGroups;
+}
 function verifyOptions(validOptions, requestOptions) {
     return requestOptions.map(rOpt => rOpt.split(' ')[0]).every(e => validOptions.includes(e))
 }
@@ -249,5 +282,8 @@ module.exports = {
     directoryTree,
     verifyOptions,
     youtubedlOptions,
-    ripmeStaticOptions
+    ripmeStaticOptions,
+    scanAll,
+    groupsClient,
+    jobOptions
 }

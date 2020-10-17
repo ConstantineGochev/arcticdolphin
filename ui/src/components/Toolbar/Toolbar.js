@@ -54,11 +54,15 @@ export default function NavToolbar() {
         </Typography>
 
         <Typography variant="h6" className={classes.Typography}>
+          <NavLink className={classes.NavLink} to="/create-groups">
+            Create Groups
+          </NavLink>
+        </Typography>
+        <Typography variant="h6" className={classes.Typography}>
           <NavLink className={classes.NavLink} to="/groups">
             Groups
           </NavLink>
         </Typography>
-
         <Typography variant="h6" className={classes.Typography}>
           <NavLink className={classes.NavLink} to="/create-jobs">
             Create Jobs
